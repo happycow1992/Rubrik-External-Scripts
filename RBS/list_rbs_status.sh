@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Bold print
+bold=$(tput bold)
+normal=$(tput sgr0)
+
 #Prints usage
 function usage
 {
@@ -69,16 +73,19 @@ clusterUUID=$(curl -s -X GET "https://$CLUSTER/api/v1/cluster/me" -H "accept: ap
 clusterName=$(curl -s -X GET "https://$CLUSTER/api/v1/cluster/me" -H "accept: application/json" -H "authorization: Basic "$hash_password"" -k | python -m json.tool  | jq -r '(.name)')
 
 # Get All non Archived VMs:
+echo "${bold}VMware-VMs${normal}" >> RBS_Objects_$clusterName.csv
 curl -s -X GET "https://$CLUSTER/api/v1/vmware/vm?is_relic=false" -H "accept: application/json" -H "authorization: Basic "$hash_password"" -k | python -m json.tool | jq -r '.data[] | "\(.name) \(.agentStatus)"' | awk '{ $(NF-1)=$(NF-1)"|"; print }' | column -t -s '|' >> RBS_Objects_$clusterName.csv
 echo
 printf "VMware Done"
 
-# Get All Hosts. Windows and Linux
+# Get All Hosts. Windows and Linux:
+echo "${bold}Physical-Hosts${normal}" >> RBS_Objects_$clusterName.csv
 curl -s -X GET "https://$CLUSTER/api/v1/host?operating_system_type=ANY" -H "accept: application/json" -H "authorization: Basic "$hash_password"" -k | python -m json.tool  | jq -r '.data[] | "\(.hostname) \(.status)"' | awk '{ $(NF-1)=$(NF-1)"|"; print }' | column -t -s '|' >> RBS_Objects_$clusterName.csv
 echo
 printf "Physical Hosts done"
 
-# Get All Nutanix VMs.
+# Get All Nutanix VMs:
+echo "${bold}Nutanix-VMs${normal}" >> RBS_Objects_$clusterName.csv
 curl -s -X GET "https://$CLUSTER/api/internal/nutanix/vm?primary_cluster_id=$clusterUUID&is_relic=false" -H "accept: application/json" -H "authorization: Basic "$hash_password"" -k | python -m json.tool  | jq -r '.data[] | "\(.name) \(.agentStatus)"' |  awk '{ $(NF-1)=$(NF-1)"|"; print }' | column -t -s '|' >> RBS_Objects_$clusterName.csv
 echo
 printf "AHV Done\n"
@@ -89,5 +96,5 @@ sed -e 's/\"agentStatus\"://g' -i RBS_Objects_$clusterName.csv
 
 cat RBS_Objects_$clusterName.csv| awk '{ $(NF-1)=$(NF-1)"|"; print }' | column -t -s '|' | tr -d '{}' | tr -d \" | grep -v REPLICATION > Object_Agent_status_$clusterName.csv
 
-printf "Output available in Object_Agent_status_$clusterName.csv file\n\n"
+printf "Output available in Object_Agent_status_$clusterName.csv (cat/less -R /Excel) file\n\n"
 rm -f RBS_Objects_$clusterName.csv
