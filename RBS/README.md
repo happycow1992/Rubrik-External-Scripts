@@ -1,6 +1,7 @@
 # Overview:
 
 Lists out all VMware VMs, Nutanix VMs, Windows and Linux Hosts and their RBS status (Registered/Unregistered)
+
 ( For VMs ) If RBS installed and Registered - Connected 
 
 ( For VMs ) If RBS installed and Not Registered - Unregistered
