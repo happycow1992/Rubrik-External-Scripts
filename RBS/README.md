@@ -1,6 +1,6 @@
 # Overview:
 
-Lists out all VMware VMs, Nutanix VMs, Windows and Linux Hosts and their RBS status
+Lists out all VMware VMs, Nutanix VMs, Windows and Linux Hosts and their RBS status (Registered/Unregistered)
 
 # Requirements: 
 
