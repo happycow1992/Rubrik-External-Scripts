@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Bold print
-bold=$(tput bold)
-normal=$(tput sgr0)
-
 #Prints usage
 function usage
 {
@@ -73,21 +69,21 @@ clusterUUID=$(curl -s -X GET "https://$CLUSTER/api/v1/cluster/me" -H "accept: ap
 clusterName=$(curl -s -X GET "https://$CLUSTER/api/v1/cluster/me" -H "accept: application/json" -H "authorization: Basic "$hash_password"" -k | python -m json.tool  | jq -r '(.name)')
 
 # Get All non Archived VMs:
-echo "${bold}VMware-VMs${normal}" >> RBS_Objects_$clusterName.csv
+echo "VMware-VMs" >> RBS_Objects_$clusterName.csv
 curl -s -X GET "https://$CLUSTER/api/v1/vmware/vm?is_relic=false" -H "accept: application/json" -H "authorization: Basic "$hash_password"" -k | python -m json.tool | jq -r '.data[] | [.name] + [.guestOsName // "null"] + [(.agentStatus.agentStatus)] |@sh' | column -t -s "'" >> RBS_Objects_$clusterName.csv
 echo >> RBS_Objects_$clusterName.csv
 printf "\nVMware Done\n"
 
 # Get All Hosts. Windows and Linux:
-echo "${bold}Physical-Hosts${normal}" >> RBS_Objects_$clusterName.csv
+echo "Physical-Hosts" >> RBS_Objects_$clusterName.csv
 curl -X GET "https://$CLUSTER/api/v1/host?operating_system_type=ANY" -H "accept: application/json" -H "authorization: Basic "$hash_password"" -k -s | python -m json.tool | jq -r '.data[] | [.name] + [.operatingSystem] + [.status] | @sh' | column -t -s "'" >> RBS_Objects_$clusterName.csv
 echo >> RBS_Objects_$clusterName.csv
 printf "Physical Hosts done\n"
 
 # Get All Nutanix VMs:
-echo "${bold}Nutanix-VMs${normal}" >> RBS_Objects_$clusterName.csv
+echo "Nutanix-VMs" >> RBS_Objects_$clusterName.csv
 curl -X GET "https://$CLUSTER/api/internal/nutanix/vm?primary_cluster_id=local&is_relic=false" -H "accept: application/json" -H "authorization: Basic "$hash_password"" -k -s | python -m json.tool | jq -r '.data[] | [.name] + [(.agentStatus.agentStatus)] |@sh' | column -t -s "'" >> RBS_Objects_$clusterName.csv
 echo >> RBS_Objects_$clusterName.csv
 printf "AHV Done\n"
 
-printf "Output available in RBS_Objects_$clusterName.csv(cat/less -R /Excel) file\n\n"
+printf "Output available in RBS_Objects_$clusterName.csv(cat/less/Excel) file\n\n"
