@@ -13,4 +13,4 @@ curl - call the Rubrik CDM RESTful API
 
 # Usage: 
 
-`./retension.sh -c "Rubrik-node-IP" -u "Username" -p "Password" <optional>`
+`./retention.sh -c "Rubrik-node-IP" -u "Username" -p "Password" <optional>`
